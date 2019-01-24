@@ -11,7 +11,7 @@ export default {
     fetching_userdata: false,
     token: loadItem('token') || '',
     orgID: loadItem('orgID') || '',
-    // user: loadItem('user') || '',
+    user: loadItem('user') || '',
     messages: [],
     metaEntities: {
       tags: [],

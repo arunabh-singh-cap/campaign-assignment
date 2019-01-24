@@ -38,39 +38,11 @@ const CapWrapper = styled.div`
 export class Cap extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      menuData: [
-        {
-          group: props.intl.formatMessage(messages.header),
-          items: [
-            {
-              link: '/sms',
-              text: props.intl.formatMessage(messages.menu1),
-              value: 'SMS',
-            },
-            {
-              link: '/wechat',
-              text: props.intl.formatMessage(messages.menu2),
-              value: 'WECHAT',
-            }
-          ],
-        },
-        {
-          group: props.intl.formatMessage(messages.campaignsDashboard),
-          items: [
-            {
-              link: '/campaign/index',
-              text: props.intl.formatMessage(messages.campaignsDashboard),
-              value: 'Campaigns Home',
-              external: true,
-            },
-          ],
-        },
-      ],
-    };
   }
   componentWillMount() {
-    this.props.actions.getUserData();
+    if (!this.props.Global.fetching_userdata) {
+      this.props.actions.getUserData();
+    }
     if (this.props.Global.user) {
       const userGtmData = this.getUserGtmData(this.props);
       gtm.push(userGtmData);
