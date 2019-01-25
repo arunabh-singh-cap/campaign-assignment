@@ -59,7 +59,6 @@
     "babel-core": "7.0.0-bridge.0"
   },
   "dependencies": {
-    "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/polyfill": "7.0.0",
     "@capillarytech/cap-react-ui-library": "^1.9.83",
     "antd": "^3.12.4",
@@ -106,6 +105,7 @@
     "@babel/cli": "7.1.2",
     "@babel/core": "7.1.2",
     "@babel/plugin-proposal-class-properties": "7.1.0",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/plugin-syntax-dynamic-import": "7.0.0",
     "@babel/plugin-transform-modules-commonjs": "7.1.0",
     "@babel/plugin-transform-react-constant-elements": "7.0.0",
