@@ -13,6 +13,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router/immutable';
+import FontFaceObserver from 'fontfaceobserver';
 import history from 'utils/history';
 import 'sanitize.css/sanitize.css';
 
@@ -23,17 +24,25 @@ import App from 'containers/App';
 import LanguageProvider from 'containers/LanguageProvider';
 
 // Load the favicon and the .htaccess file
-/* eslint-disable import/no-unresolved, import/extensions */
 import '!file-loader?name=[name].[ext]!./images/favicon.ico';
-import 'file-loader?name=.htaccess!./.htaccess';
-/* eslint-enable import/no-unresolved, import/extensions */
+import 'file-loader?name=.htaccess!./.htaccess'; // eslint-disable-line import/extensions
 
 import configureStore from './configureStore';
-import initialState from './initialState';
+
 // Import i18n messages
 import { translationMessages } from './i18n';
 
+// Observe loading of Open Sans (to remove roboto, remove the <link> tag in
+// the index.html file and this observer)
+const openSansObserver = new FontFaceObserver('Roboto', {});
+
+// When Roboto is loaded, add a font-family using Robotot to the body
+openSansObserver.load().then(() => {
+  document.body.classList.add('fontLoaded');
+});
+
 // Create redux store with history
+const initialState = {};
 const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('app');
 
@@ -65,7 +74,12 @@ if (!window.Intl) {
   new Promise(resolve => {
     resolve(import('intl'));
   })
-    .then(() => Promise.all([import('intl/locale-data/jsonp/en.js')]))
+    .then(() =>
+      Promise.all([
+        import('intl/locale-data/jsonp/en.js'),
+        import('intl/locale-data/jsonp/de.js'),
+      ]),
+    ) // eslint-disable-line prettier/prettier
     .then(() => render(translationMessages))
     .catch(err => {
       throw err;
