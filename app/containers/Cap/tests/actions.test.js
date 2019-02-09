@@ -1,13 +1,13 @@
-import { defaultAction } from '../actions';
-import { DEFAULT_ACTION } from '../constants';
+import * as actions from '../actions';
+import * as types from '../constants';
 
 describe('Cap actions', () => {
   describe('Default Action', () => {
     it('has a type of DEFAULT_ACTION', () => {
       const expected = {
-        type: DEFAULT_ACTION,
+        type: types.LOGOUT_REQUEST,
       };
-      expect(defaultAction()).toEqual(expected);
+      expect(actions.logout()).toEqual(expected);
     });
   });
 });

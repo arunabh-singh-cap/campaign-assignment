@@ -1,8 +1,4 @@
-/**
- * Created by vivek on 17/2/17.
- */
-
-export const loadItem = (key) => {
+export const loadItem = key => {
   try {
     const serializedState = localStorage.getItem(key);
     if (serializedState === null) {
@@ -23,7 +19,7 @@ export const saveItem = (key, value) => {
   }
 };
 
-export const clearItem = (key) => {
+export const clearItem = key => {
   try {
     localStorage.removeItem(key);
     return true;

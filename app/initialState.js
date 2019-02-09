@@ -1,6 +1,3 @@
-/**
- * Created by vivek on 22/5/17.
- */
 import { loadItem } from './services/localStorageApi';
 
 // const isLoggedIn = loadItem('isLoggedIn') || false;

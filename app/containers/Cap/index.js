@@ -8,29 +8,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Switch, Route } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
 import { compose, bindActionCreators } from 'redux';
 import styled from 'styled-components';
-import injectSaga from '../../utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
-import { isEqual } from 'lodash';
-import {makeSelectCap, makeSelectUser} from './selectors';
+import { isEqual, find, forEach, isEmpty } from 'lodash';
+import { injectIntl } from 'react-intl';
+import CapSpinner from '@capillarytech/cap-react-ui-library/CapSpinner';
+import injectSaga from '../../utils/injectSaga';
+import { makeSelectCap } from './selectors';
 import reducer from './reducer';
 import sagas from './saga';
 import messages from './messages';
-import { injectIntl, intlShape } from 'react-intl';
 import TopBar from '../../components/TopBar';
 import * as actions from './actions';
 import config from '../../config/app';
 const gtm = window.dataLayer || [];
-
 
 /* eslint-disable react/prefer-stateless-function */
 const CapWrapper = styled.div`
   margin: 0 auto;
   display: flex;
   min-height: 100%;
+  width: calc(100% - 280px);
   padding: 0;
   flex-direction: column;
 `;
@@ -38,8 +39,19 @@ const CapWrapper = styled.div`
 export class Cap extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      menus: [
+        {
+          title: 'Campaigns',
+          link: `${this.props.match.path}/list`,
+          key: 'campaigns-list',
+        },
+      ],
+      routes: [],
+    };
   }
-  componentWillMount() {
+
+  componentDidMount() {
     if (!this.props.Global.fetching_userdata) {
       this.props.actions.getUserData();
     }
@@ -48,10 +60,13 @@ export class Cap extends React.Component {
       gtm.push(userGtmData);
     }
     if (this.props.Global.orgID !== undefined) {
-      gtm.push({orgId: this.props.Global.orgID});
+      gtm.push({ orgId: this.props.Global.orgID });
     }
     if (this.props.Global.isLoggedIn) {
-      if (this.props.Global.user && Object.keys(this.props.Global.user).length) {
+      if (
+        this.props.Global.user &&
+        Object.keys(this.props.Global.user).length
+      ) {
         // gtm.push({userId: this.props.Global.user.id});
         // this.props.appActions.getSidebar();
       }
@@ -59,10 +74,15 @@ export class Cap extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const user = this.props.Global.user;
-    const nextPropsUser = nextProps.Global.user;
-    if (!nextProps.Global.settingProxyOrg && nextProps.Global.changeProxyOrgSuccess &&
-      !_.isEqual(nextProps.Global.changeProxyOrgSuccess, this.props.Global.changeProxyOrgSuccess) && !this.state.switchedOrg) {
+    if (
+      !nextProps.Global.settingProxyOrg &&
+      nextProps.Global.changeProxyOrgSuccess &&
+      !isEqual(
+        nextProps.Global.changeProxyOrgSuccess,
+        this.props.Global.changeProxyOrgSuccess,
+      ) &&
+      !this.state.switchedOrg
+    ) {
       this.navigateToDashboard();
     }
 
@@ -77,24 +97,34 @@ export class Cap extends React.Component {
     //   this.props.appActions.getSidebar();
     // }
 
-    if (nextProps.Global.user && this.props.Global.user && (nextProps.Global.user.refID !== this.props.Global.user.refID)) {
+    if (
+      nextProps.Global.user &&
+      this.props.Global.user &&
+      nextProps.Global.user.refID !== this.props.Global.user.refID
+    ) {
       const userGtmData = this.getUserGtmData(nextProps);
       gtm.push(userGtmData);
     }
 
-    if (nextProps.Global.isLoggedIn && nextProps.Global.isLoggedIn !== this.props.Global.isLoggedIn) {
-      if (nextProps.Global.orgID !== undefined && !isEqual(nextProps.Global.orgID, this.props.Global.orgID)) {
+    if (
+      nextProps.Global.isLoggedIn &&
+      nextProps.Global.isLoggedIn !== this.props.Global.isLoggedIn
+    ) {
+      if (
+        nextProps.Global.orgID !== undefined &&
+        !isEqual(nextProps.Global.orgID, this.props.Global.orgID)
+      ) {
         const userGtmData = this.getUserGtmData(nextProps);
         gtm.push(userGtmData);
       }
     }
   }
 
-  getUserGtmData = (props) => {
+  getUserGtmData = props => {
     const { user: userData } = props.Global;
     const userName = userData.attributes.USERNAME;
     const userEmail = userData.attributes.EMAIL;
-    const orgObj = find(userData.proxyOrgList, {orgID: props.Global.orgID});
+    const orgObj = find(userData.proxyOrgList, { orgID: props.Global.orgID });
     const gtmData = {
       orgId: props.Global.orgID,
       orgName: orgObj && orgObj.orgName,
@@ -104,23 +134,25 @@ export class Cap extends React.Component {
       isCapUser: userData.isCapUser,
     };
     return gtmData;
-  }
-
+  };
 
   componentWillUnmount() {
-    this.setState({switchedOrg: false, switchedOu: false});
+    this.setState({ switchedOrg: false });
   }
 
-  handleRemoveMessage = (messageIndex) => {
+  handleRemoveMessage = messageIndex => {
     this.props.actions.removeMessageFromQueue(messageIndex);
   };
 
-  updateMenu = (id) => {
+  updateMenu = id => {
     this.props.actions.updateMenu(id);
   };
 
   navigateToDashboard = () => {
-    const defaultPage = (process.env.NODE_ENV === 'production') ? config.production.dashboard_url : config.development.dashboard_url;
+    const defaultPage =
+      process.env.NODE_ENV === 'production'
+        ? config.production.dashboard_url
+        : config.development.dashboard_url;
     this.props.history.push(defaultPage);
   };
 
@@ -140,33 +172,30 @@ export class Cap extends React.Component {
     }
   };
 
-  changeOrg = (orgId) => {
+  changeOrg = orgId => {
     this.props.actions.changeOrg(orgId);
   };
 
-  changeOu = (ouId) => {
+  changeOu = ouId => {
     this.props.actions.changeOu(ouId);
   };
+
   render() {
     const userData = this.props.Global;
-    const query = new URLSearchParams(this.props.location.search)
-    const type = query.get("type");
-    // const changeOrg = this.props.actions.changeOrg;
-    // const logout = this.props.actions.logout;
-    console.log('props', this.props);
+    const query = new URLSearchParams(this.props.location.search);
+    const type = query.get('type');
     const proxyOrgList = [];
     let defaultOrgName = '';
     let defaultOrgId = '';
     let userName = '';
-    const navigateToDashboard = this.navigateToDashboard;
+    const { navigateToDashboard } = this;
     if (userData && userData.user && userData.user !== '') {
-      console.log('Org name ', userData.user.orgName, userData.user.orgID);
       defaultOrgName = userData.user.orgName;
       defaultOrgId = userData.user.orgID;
       proxyOrgList.push({ text: defaultOrgName, value: defaultOrgId });
       const orgList = userData.user.proxyOrgList;
-      if (!_.isEmpty(orgList)) {
-        _.forEach(orgList, (item) => {
+      if (!isEmpty(orgList)) {
+        forEach(orgList, item => {
           const id = item.orgID;
           let name = item.orgName;
           if (id === 486) {
@@ -177,23 +206,16 @@ export class Cap extends React.Component {
       }
       userName = userData.user.firstName;
     }
-    const actionComponents = "";
-    const toastMessages = this.props.Global.messages;
-    const loggedIn = this.props.Global.isLoggedIn;
+    const loggedIn = !!this.props.Global.token;
 
-
-    const productMenuData = [
-      // {
-      //   text: this.props.intl.formatMessage(messages.creatives),
-      //   value: 'Creatives',
-      //   url: '/creatives/ui/',
-      // },
-    ];
+    const productMenuData = [];
     if (this.props.Global.currentOrgDetails) {
-      _.forEach(this.props.Global.currentOrgDetails.module_details, (module) => {
+      forEach(this.props.Global.currentOrgDetails.module_details, module => {
         if (module.display_order > 0) {
           productMenuData.push({
-            text: (messages[module.name]) ? this.props.intl.formatMessage(messages[module.name]) : module.name,
+            text: messages[module.name]
+              ? this.props.intl.formatMessage(messages[module.name])
+              : module.name,
             value: module.name.toLowerCase(),
             url: module.url,
           });
@@ -201,47 +223,54 @@ export class Cap extends React.Component {
       });
     }
 
+    const RenderRoute = ({ component: Component, ...rest }) => (
+      <Route {...rest} render={props => <Component {...props} />} />
+    );
     return (
-      <CapWrapper>
+      <CapSpinner spinning={this.props.Global.fetching_userdata}>
         <Helmet>
           <title>Cap</title>
           <meta name="description" content="Description of Cap" />
         </Helmet>
         <div className="wrapper">
-          {loggedIn && type !== 'embedded' ?
+          {loggedIn && type !== 'embedded' ? (
             <TopBar
               proxyOrgList={proxyOrgList}
               userName={userName}
               orgName={defaultOrgName}
-              orgID={defaultOrgId}
+              orgID={defaultOrgId.toString()}
               changeOrg={this.changeOrg}
               navigateToDashboard={navigateToDashboard}
               logout={this.logout}
-            /> : ''}
+              menus={this.state.menus}
+              baseUrl={this.props.match.path}
+            />
+          ) : (
+            ''
+          )}
           <div className="main">
-            <div className="main-content">
-            </div>
+            <CapWrapper>
+              <Switch>
+                {/* <Route path={`${this.props.match.path}/`} component={Main} /> */}
+                {this.state.routes.map(routeProps => (
+                  <RenderRoute {...routeProps} key={routeProps.path} />
+                ))}
+              </Switch>
+            </CapWrapper>
           </div>
         </div>
-        {(toastMessages && toastMessages.length > 0) ?
-          <Toastr timeout={4000} messagesList={toastMessages} position="top-right" handleRemoveMessage={this.handleRemoveMessage} />
-          : ''}
-        {this.props.Global.fetching_userdata &&
-        <div className="cap-loader-box">
-          <img
-            className="loader-image"
-            src="https://s3.amazonaws.com/fileservice.in/intouch_creative_assets/88561f46de9407021cad.gif"
-            alt="Capillary"/>
-        </div>
-        }
-      </CapWrapper>
+      </CapSpinner>
     );
   }
 }
 
 Cap.propTypes = {
-  dispatch: PropTypes.func.isRequired,
   Global: PropTypes.object,
+  match: PropTypes.object,
+  history: PropTypes.object,
+  actions: PropTypes.object,
+  location: PropTypes.object,
+  intl: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -261,10 +290,10 @@ const withConnect = connect(
 
 const withReducer = injectReducer({ key: 'cap', reducer });
 // const withSaga = sagas.map((saga, index) => injectSaga({ key: `cap-${index}`, saga }));
-const withSaga = sagas.map((saga, index) => injectSaga({ key: `cap-${index}`, saga }));
+const withSaga = sagas.map((saga, index) =>
+  injectSaga({ key: `cap-${index}`, saga }),
+);
 
-export default compose.apply(null, [
-  withReducer,
-  ...withSaga,
-  withConnect,
-])(injectIntl(withRouter(Cap)));
+export default compose.apply(null, [withReducer, ...withSaga, withConnect])(
+  injectIntl(withRouter(Cap)),
+);

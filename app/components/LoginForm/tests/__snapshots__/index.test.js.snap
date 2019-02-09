@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div>
+  <input
+    className="ant-input"
+    disabled={false}
+    icon="user"
+    iconPosition="left"
+    name="username"
+    onChange={[Function]}
+    onKeyDown={[Function]}
+    placeholder="Username or Email"
+    type="text"
+    value=""
+  />
+  <input
+    className="ant-input"
+    disabled={false}
+    icon="lock"
+    iconPosition="left"
+    name="password"
+    onChange={[Function]}
+    onKeyDown={[Function]}
+    placeholder="Password"
+    type="password"
+    value=""
+  />
+  <button
+    className="ant-btn"
+    fluid={true}
+    onClick={[Function]}
+    primary={true}
+    type="button"
+  >
+    <span>
+      Login
+    </span>
+  </button>
+</div>
+`;

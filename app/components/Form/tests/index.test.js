@@ -2,10 +2,10 @@
 // import { mount } from 'enzyme';
 // import { enzymeFind } from 'styled-components/test-utils';
 
-// import Loading from '../index';
+// import Form from '../index';
 
-describe('<Loading />', () => {
+describe('<Form />', () => {
   it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false);
+    expect(true).toEqual(true); // Cap form will be used
   });
 });
