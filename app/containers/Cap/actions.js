@@ -42,3 +42,24 @@ export function getUserData() {
     type: types.GET_USER_DATA_REQUEST,
   };
 }
+
+export function getMenuData(code) {
+  return {
+    type: types.GET_MENU_DATA_REQUEST,
+    code,
+  };
+}
+
+export function getMenuDataSuccess(data) {
+  return {
+    type: types.GET_MENU_DATA_SUCCESS,
+    data,
+  };
+}
+
+export function getMenuDataFailure(error) {
+  return {
+    type: types.GET_MENU_DATA_FAILURE,
+    error,
+  };
+}

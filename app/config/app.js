@@ -9,12 +9,14 @@ const config = {
     auth_endpoint: '/arya/api/v1/auth',
     login_url: '/login',
     dashboard_url: path.publicPath,
+    data_org_id: 0,
   },
   development: {
     api_endpoint: 'https://nightly.capillary.in/arya/api/v1/creatives',
     auth_endpoint: 'https://nightly.capillary.in/arya/api/v1/auth',
     login_url: '/login',
     dashboard_url: path.publicPath,
+    data_org_id: 0,
   },
   testing: {
     api_endpoint: '',

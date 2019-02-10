@@ -119,6 +119,47 @@ function getAPICallObjectForAuth(method, body, isFileUpload = false) {
   return requestObj;
 }
 
+const dataOrgId = isProd
+  ? config.production.data_org_id
+  : config.development.data_org_id;
+
+function getAPICallObject(method, body) {
+  const token = loadItem('token');
+  const orgID = loadItem('orgID');
+  const ouId = loadItem('ouId');
+  const user = loadItem('user');
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  if (user && user.refID) {
+    headers['X-CAP-REMOTE-USER'] = user.refID;
+  }
+  if (process.env.NODE_ENV !== 'production' && orgID !== undefined) {
+    headers['X-CAP-API-AUTH-ORG-ID'] = orgID;
+  }
+  if (ouId !== undefined) {
+    headers['x-cap-api-auth-ou-id'] = ouId;
+  }
+  headers['x-cap-api-data-context-org-id'] = orgID === 0 ? dataOrgId : orgID;
+  if (process.env.NODE_ENV !== 'production' && token !== undefined) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  const requestObj = {
+    method,
+    mode: 'cors',
+    headers: new Headers(headers),
+  };
+
+  if (isProd) {
+    requestObj.credentials = 'same-origin';
+  }
+
+  if (body) {
+    requestObj.body = JSON.stringify(body);
+  }
+  return requestObj;
+}
 // Authentication
 export const authorize = user => {
   const body = {
@@ -149,15 +190,12 @@ export const changeProxyOrg = orgId => {
   return request(url, getAPICallObjectForAuth('Post'));
 };
 
-export const getSidebar = () => {
-  // Insert your call here for getting sidebar
-  const url = `${API_ENDPOINT}/getSidebar`;
-  const response = { response: { sidebar: [url] } };
-  // return request(url, getAPICallObject('GET'));
-  return response;
-};
-
 export const getUserData = () => {
   const url = `${API_AUTH_ENDPOINT}/user`;
   return request(url, getAPICallObjectForAuth('GET'));
+};
+
+export const getMenuData = code => {
+  const url = `${API_AUTH_ENDPOINT}/user/${code}/actions`;
+  return request(url, getAPICallObject('GET'));
 };

@@ -62,7 +62,7 @@
     "@babel/polyfill": "7.0.0",
     "@capillarytech/cap-react-ui-library": "^1.9.83",
     "@capillarytech/cap-ui-library": "^1.0.3",
-    "antd": "^3.12.4",
+    "antd": "^3.13.2",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
     "compression": "1.7.3",

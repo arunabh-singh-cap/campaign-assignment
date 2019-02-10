@@ -24,4 +24,13 @@ const makeSelectUser = () =>
 const makeSelectUserLoading = () =>
   createSelector(selectCap, capstate => capstate.get('loadingUser'));
 
-export { selectCap, makeSelectCap, makeSelectUserLoading, makeSelectUser };
+const makeSelectMenuData = () =>
+  createSelector(selectCap, capstate => capstate.get('menuData').toJS());
+
+export {
+  selectCap,
+  makeSelectCap,
+  makeSelectUserLoading,
+  makeSelectUser,
+  makeSelectMenuData,
+};

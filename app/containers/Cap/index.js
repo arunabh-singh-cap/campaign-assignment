@@ -7,8 +7,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { CapSideBar } from '@capillarytech/cap-ui-library';
 import { Helmet } from 'react-helmet';
-import { withRouter, Switch, Route } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
 import { compose, bindActionCreators } from 'redux';
 import styled from 'styled-components';
@@ -17,7 +18,7 @@ import { isEqual, find, forEach, isEmpty } from 'lodash';
 import { injectIntl } from 'react-intl';
 import CapSpinner from '@capillarytech/cap-react-ui-library/CapSpinner';
 import injectSaga from '../../utils/injectSaga';
-import { makeSelectCap } from './selectors';
+import { makeSelectCap, makeSelectMenuData } from './selectors';
 import reducer from './reducer';
 import sagas from './saga';
 import messages from './messages';
@@ -26,7 +27,6 @@ import * as actions from './actions';
 import config from '../../config/app';
 const gtm = window.dataLayer || [];
 
-/* eslint-disable react/prefer-stateless-function */
 const CapWrapper = styled.div`
   margin: 0 auto;
   display: flex;
@@ -36,18 +36,16 @@ const CapWrapper = styled.div`
   flex-direction: column;
 `;
 
+const RenderRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={props => <Component {...props} />} />
+);
+
 export class Cap extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      menus: [
-        {
-          title: 'Campaigns',
-          link: `${this.props.match.path}/list`,
-          key: 'campaigns-list',
-        },
-      ],
       routes: [],
+      selectedProduct: '',
     };
   }
 
@@ -104,6 +102,19 @@ export class Cap extends React.Component {
       ) {
         const userGtmData = this.getUserGtmData(nextProps);
         gtm.push(userGtmData);
+      }
+    }
+    const { currentOrgDetails } = nextProps.Global;
+    if (!isEqual(currentOrgDetails, this.props.Global.currentOrgDetails)) {
+      let selectedProduct;
+      const { path } = nextProps.match;
+      forEach(currentOrgDetails.module_details, module => {
+        if (module.url === `${path}/index`) {
+          this.props.actions.getMenuData(module.code);
+        }
+      });
+      if (selectedProduct) {
+        this.setState({ selectedProduct });
       }
     }
   }
@@ -168,8 +179,37 @@ export class Cap extends React.Component {
     this.props.actions.changeOu(ouId);
   };
 
+  handleProductChange = (value, option) => {
+    const { path } = this.props.match;
+    if (option.url !== `${path}/index`) {
+      this.props.history.push(option.url);
+    }
+  };
+
+  getParsedMenuData = data =>
+    Object.entries(data).map(([key, value]) => {
+      if (value.url) {
+        return {
+          title: value.name,
+          key,
+          link: value.url,
+        };
+      }
+      return {
+        title: key,
+        key,
+        children: this.getParsedMenuData(value),
+      };
+    });
+
   render() {
     const userData = this.props.Global;
+    const { menuData } = this.props;
+    let parsedMenuData = [];
+    if (menuData.status === 'success') {
+      parsedMenuData = this.getParsedMenuData(menuData.data._actions);
+    }
+    console.log(parsedMenuData);
     const query = new URLSearchParams(this.props.location.search);
     const type = query.get('type');
     const proxyOrgList = [];
@@ -180,7 +220,7 @@ export class Cap extends React.Component {
     if (userData && userData.user && userData.user !== '') {
       defaultOrgName = userData.user.orgName;
       defaultOrgId = userData.user.orgID;
-      proxyOrgList.push({ text: defaultOrgName, value: defaultOrgId });
+      proxyOrgList.push({ label: defaultOrgName, value: defaultOrgId });
       const orgList = userData.user.proxyOrgList;
       if (!isEmpty(orgList)) {
         forEach(orgList, item => {
@@ -189,7 +229,9 @@ export class Cap extends React.Component {
           if (id === 486) {
             name = 'Demo Org';
           }
-          proxyOrgList.push({ key: id, text: name, value: id });
+          if (id !== defaultOrgId) {
+            proxyOrgList.push({ label: name, value: id });
+          }
         });
       }
       userName = userData.user.firstName;
@@ -199,21 +241,15 @@ export class Cap extends React.Component {
     const productMenuData = [];
     if (this.props.Global.currentOrgDetails) {
       forEach(this.props.Global.currentOrgDetails.module_details, module => {
-        if (module.display_order > 0) {
-          productMenuData.push({
-            text: messages[module.name]
-              ? this.props.intl.formatMessage(messages[module.name])
-              : module.name,
-            value: module.name.toLowerCase(),
-            url: module.url,
-          });
-        }
+        productMenuData.push({
+          label: messages[module.name]
+            ? this.props.intl.formatMessage(messages[module.name])
+            : module.name,
+          value: module.name.toLowerCase(),
+          url: module.url,
+        });
       });
     }
-
-    const RenderRoute = ({ component: Component, ...rest }) => (
-      <Route {...rest} render={props => <Component {...props} />} />
-    );
     return (
       <CapSpinner spinning={this.props.Global.fetching_userdata}>
         <Helmet>
@@ -225,17 +261,19 @@ export class Cap extends React.Component {
             <TopBar
               proxyOrgList={proxyOrgList}
               userName={userName}
-              orgName={defaultOrgName}
               orgID={defaultOrgId.toString()}
               changeOrg={this.changeOrg}
               navigateToDashboard={navigateToDashboard}
               logout={this.logout}
-              menus={this.state.menus}
+              productMenuData={productMenuData}
               baseUrl={this.props.match.path}
+              selectedProduct={this.state.selectedProduct}
+              handleProductChange={this.handleProductChange}
             />
           ) : (
             ''
           )}
+          <CapSideBar sidebarItems={parsedMenuData} />
           <div className="main">
             <CapWrapper>
               <Switch>
@@ -258,11 +296,13 @@ Cap.propTypes = {
   history: PropTypes.object,
   actions: PropTypes.object,
   location: PropTypes.object,
+  menuData: PropTypes.object,
   intl: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({
   Global: makeSelectCap(),
+  menuData: makeSelectMenuData(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -282,6 +322,8 @@ const withSaga = sagas.map((saga, index) =>
   injectSaga({ key: `cap-${index}`, saga }),
 );
 
-export default compose.apply(null, [withReducer, ...withSaga, withConnect])(
-  injectIntl(withRouter(Cap)),
-);
+export default compose(
+  withReducer,
+  ...withSaga,
+  withConnect,
+)(injectIntl(Cap));

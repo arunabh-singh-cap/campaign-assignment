@@ -10,6 +10,7 @@ export const initialState = fromJS({
   token: loadItem('token') || '',
   orgID: loadItem('orgID') || '',
   user: loadItem('user') || '',
+  menuData: {},
 });
 
 function capReducer(state = initialState, action) {
@@ -79,6 +80,18 @@ function capReducer(state = initialState, action) {
         .set('orgID', action.currentOrgId);
     case types.GET_USER_DATA_FAILURE:
       return state.set('fetching_userdata', false).set('isLoggedIn', false);
+    case types.GET_MENU_DATA_REQUEST:
+      return state.set('menuData', fromJS({ status: 'request' }));
+    case types.GET_MENU_DATA_SUCCESS:
+      return state.set(
+        'menuData',
+        fromJS({ status: 'success', data: action.data }),
+      );
+    case types.GET_MENU_DATA_FAILURE:
+      return state.set(
+        'menuData',
+        fromJS({ status: 'failure', error: action.error }),
+      );
     default:
       return state;
   }

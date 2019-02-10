@@ -63,6 +63,18 @@ function* logoutFlow() {
   }
 }
 
+function* getMenuData({ code }) {
+  try {
+    const response = yield call(Api.getMenuData, code);
+    yield put({
+      type: types.GET_MENU_DATA_SUCCESS,
+      data: response.result[code],
+    });
+  } catch (error) {
+    yield put({ type: types.GET_MENU_DATA_FAILURE, error });
+  }
+}
+
 export function* fetchUserInfo() {
   try {
     const result = yield call(Api.getUserData);
@@ -113,6 +125,7 @@ export function* fetchUserInfo() {
 }
 
 function* watchForOrgChange() {
+  console.log('org change watcher');
   yield takeLatest(types.SWITCH_ORG_REQUEST, switchOrg);
 }
 
@@ -124,9 +137,14 @@ function* watchForFetchUserInfo() {
   yield takeLatest(types.GET_USER_DATA_REQUEST, fetchUserInfo);
 }
 
+function* watchGetMenuData() {
+  yield takeLatest(types.GET_MENU_DATA_REQUEST, getMenuData);
+}
+
 export default [
   loginFlow,
   watchForOrgChange,
   watchForLogoutFlow,
   watchForFetchUserInfo,
+  watchGetMenuData,
 ];
