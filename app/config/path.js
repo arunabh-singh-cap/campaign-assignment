@@ -1,3 +1,3 @@
 module.exports = {
-  publicPath: '/campaigns/ui',
+  publicPath: '/campaigns',
 };

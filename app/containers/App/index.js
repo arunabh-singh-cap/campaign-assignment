@@ -8,7 +8,7 @@
  */
 
 import React from 'react'; // eslint-disable-line no-unused-vars
-import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
+import { Switch, Route, Router } from 'react-router-dom';
 import history from 'utils/history';
 
 import Cap from '../Cap';
@@ -19,13 +19,11 @@ import GlobalStyle from '../../global-styles';
 import { publicPath } from '../../config/path';
 
 import { userIsAuthenticatedRedir } from '../../utils/authWrapper';
-
+const Protected = userIsAuthenticatedRedir(Cap);
+const RenderRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={props => <Component {...props} />} />
+);
 export default function App() {
-  // const LoginComp = userIsNotAuthenticatedRedir(Login);
-  const Protected = userIsAuthenticatedRedir(Cap);
-  const RenderRoute = ({ component: Component, ...rest }) => (
-    <Route {...rest} render={props => <Component {...props} />} />
-  );
   return (
     <div>
       <Router history={history}>

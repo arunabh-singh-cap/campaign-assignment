@@ -47,7 +47,6 @@ const redirectUrl =
 
 export const userIsNotAuthenticatedRedir = connectedRouterRedirect({
   ...userIsNotAuthenticatedDefaults,
-  // redirectPath: '/login',
   redirectPath: (state, ownProps) =>
     locationHelper.getRedirectQueryParam(ownProps) || redirectUrl,
   allowRedirectBack: false,

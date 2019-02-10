@@ -47,8 +47,6 @@ class LoginForm extends React.Component {
             <Input
               type="text"
               name="username"
-              icon="user"
-              iconPosition="left"
               placeholder={message}
               value={this.state.username}
               onChange={this.handleInputChange}
@@ -60,8 +58,6 @@ class LoginForm extends React.Component {
             <Input
               type="password"
               name="password"
-              icon="lock"
-              iconPosition="left"
               placeholder={message}
               value={this.state.password}
               onChange={this.handleInputChange}
@@ -69,8 +65,6 @@ class LoginForm extends React.Component {
           )}
         </FormattedMessage>
         <Button
-          primary
-          fluid
           loading={this.props.loginInProgress}
           disabled={this.props.loginInProgress}
           onClick={this.login}

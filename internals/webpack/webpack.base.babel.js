@@ -12,74 +12,97 @@ const extractSass = new ExtractTextPlugin({
   disable: true,
 });
 
-module.exports = (options) => ({
+module.exports = options => ({
   node: {
-    fs: "empty",
+    fs: 'empty',
   },
   entry: options.entry,
-  output: Object.assign({ // Compile into js/build.js
-    path: path.resolve(process.cwd(), 'dist'),
-    publicPath: pathConfig.publicPath,
-  }, options.output), // Merge with env dependent settings
+  output: Object.assign(
+    {
+      // Compile into js/build.js
+      path: path.resolve(process.cwd(), 'dist'),
+      publicPath: pathConfig.publicPath,
+    },
+    options.output,
+  ), // Merge with env dependent settings
   module: {
-    rules: [{
-      test: /\.js$/,
-      use: ["source-map-loader"],
-      enforce: "pre",
-    }, {
-      test: /\.js$/, // Transform all .js files required somewhere with Babel
-      use: {
-        loader: 'babel-loader',
-        options: options.babelQuery,
+    rules: [
+      {
+        test: /\.js$/,
+        use: ['source-map-loader'],
+        enforce: 'pre',
       },
-      exclude: /node_modules\/(?!@capillarytech)/,
-    }, {
-      test: /\.scss$/,
-      exclude: /node_modules\/(?!@capillarytech)/,
-      use: extractSass.extract({
-        use: ['css-loader', 'sass-loader', 'sass-loader?sourceMap'],
-        fallback: 'style-loader',
-      }),
-    }, {
-      // // Do not transform vendor's CSS with CSS-modules
-      // // The point is that they remain in global scope.
-      // // Since we require these CSS files in our JS or CSS files,
-      // // they will be a part of our compilation either way.
-      // // So, no need for ExtractTextPlugin here.
-      test: /\.css$/,
-      use: ['style-loader', 'css-loader'],
-    }, {
-      test: /\.(eot|svg|ttf|woff|woff2)$/,
-      use: 'file-loader',
-    }, {
-      test: /\.(jpg|png|gif)$/,
-      use: [
-        'file-loader',
-        {
-          loader: 'image-webpack-loader',
+      {
+        test: /\.js$/, // Transform all .js files required somewhere with Babel
+        use: {
+          loader: 'babel-loader',
           options: {
-            progressive: true,
-            optimizationLevel: 7,
-            interlaced: false,
-            pngquant: {
-              quality: '65-90',
-              speed: 4,
-            },
+            presets: ['@babel/preset-env'],
           },
         },
-      ],
-    }, {
-      test: /\.html$/,
-      use: 'html-loader',
-    }, {
-      test: /\.(mp4|webm)$/,
-      use: {
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
+        exclude: /node_modules\/(?!@capillarytech)/,
+      },
+      {
+        test: /\.scss$/,
+        exclude: /node_modules\/(?!@capillarytech)/,
+        use: extractSass.extract({
+          use: ['css-loader', 'sass-loader', 'sass-loader?sourceMap'],
+          fallback: 'style-loader',
+        }),
+      },
+      {
+        test: /\.less$/,
+        exclude: /node_modules\/(?!@capillarytech)/,
+        use: extractSass.extract({
+          use: ['style-loader', 'css-loader', 'less-loader'],
+          fallback: 'style-loader',
+        }),
+      },
+      {
+        // // Do not transform vendor's CSS with CSS-modules
+        // // The point is that they remain in global scope.
+        // // Since we require these CSS files in our JS or CSS files,
+        // // they will be a part of our compilation either way.
+        // // So, no need for ExtractTextPlugin here.
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        use: 'file-loader',
+      },
+      {
+        test: /\.(jpg|png|gif)$/,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              progressive: true,
+              optimizationLevel: 7,
+              interlaced: false,
+              pngquant: {
+                quality: '65-90',
+                speed: 4,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.html$/,
+        use: 'html-loader',
+      },
+      {
+        test: /\.(mp4|webm)$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 10000,
+          },
         },
       },
-    }],
+    ],
   },
   plugins: options.plugins.concat([
     new webpack.ProvidePlugin({
@@ -100,17 +123,11 @@ module.exports = (options) => ({
   ]),
   resolve: {
     modules: ['app', 'node_modules'],
-    alias: { moment$: 'moment/moment.js' },
-    extensions: [
-      '.js',
-      '.jsx',
-      '.react.js',
-    ],
-    mainFields: [
-      'browser',
-      'jsnext:main',
-      'main',
-    ],
+    alias: {
+      moment$: 'moment/moment.js',
+    },
+    extensions: ['.js', '.jsx', '.react.js'],
+    mainFields: ['browser', 'jsnext:main', 'main'],
   },
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window

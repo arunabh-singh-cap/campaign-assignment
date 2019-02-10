@@ -85,18 +85,6 @@ export class Cap extends React.Component {
     ) {
       this.navigateToDashboard();
     }
-
-    // const callBack = nextProps.routeParams.callbackUrl ? decodeURIComponent(nextProps.routeParams.callbackUrl) : "";
-    // if (nextProps.Global.error) {
-    //   const locationValue = `${window.location.origin}${callBack}?flash=${nextProps.Global.error}`;
-    //   window.location.replace(locationValue);
-    //   window.location.reload();
-    // }
-
-    // if (nextPropsUser && user && nextProps.Global.isLoggedIn && nextProps.Global.isLoggedIn !== this.props.Global.isLoggedIn) {
-    //   this.props.appActions.getSidebar();
-    // }
-
     if (
       nextProps.Global.user &&
       this.props.Global.user &&

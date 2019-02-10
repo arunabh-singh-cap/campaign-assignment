@@ -1,12 +1,18 @@
-/**
- * Created by vivek on 22/5/17.
- */
 import { fromJS } from 'immutable';
 import _ from 'lodash';
 import * as types from './constants';
-import initialState from '../../initialState';
+import { loadItem } from '../../services/localStorageApi';
 
-function capReducer(state = fromJS(initialState), action) {
+// The initial state of the App
+export const initialState = fromJS({
+  login_progress: false,
+  fetching_userdata: false,
+  token: loadItem('token') || '',
+  orgID: loadItem('orgID') || '',
+  user: loadItem('user') || '',
+});
+
+function capReducer(state = initialState, action) {
   switch (action.type) {
     case types.LOGIN_REQUEST:
       return state.set('login_progress', true);

@@ -1,35 +1,27 @@
+/**
+ * The global state selectors
+ */
+
 import { createSelector } from 'reselect';
+import { initialState } from './reducer';
 
 /**
  * Direct selector to the cap state domain
  */
 
-const selectCapDomain = state => state.get('cap');
+const selectCap = state => state.get('cap', initialState);
 
 /**
  * Other specific selectors
  */
 
-/**
- * Default selector used by Cap
- */
-
 const makeSelectCap = () =>
-  createSelector(selectCapDomain, substate => substate.toJS());
-
-const makeSelectLogin = () =>
-  createSelector(selectCapDomain, substate => substate.toJS());
+  createSelector(selectCap, capstate => capstate.toJS());
 
 const makeSelectUser = () =>
-  createSelector(selectCapDomain, substate => !!substate.toJS().token);
+  createSelector(selectCap, capstate => !!capstate.get('token'));
 
 const makeSelectUserLoading = () =>
-  createSelector(selectCapDomain, substate => substate.toJS().loadingUser);
+  createSelector(selectCap, capstate => capstate.get('loadingUser'));
 
-export {
-  selectCapDomain,
-  makeSelectCap,
-  makeSelectUser,
-  makeSelectUserLoading,
-  makeSelectLogin,
-};
+export { selectCap, makeSelectCap, makeSelectUserLoading, makeSelectUser };

@@ -1,12 +1,4 @@
-import {
-  fork,
-  take,
-  call,
-  put,
-  cancelled,
-  cancel,
-  takeLatest,
-} from 'redux-saga/effects';
+import { fork, take, call, put, cancel, takeLatest } from 'redux-saga/effects';
 // import { LOCATION_CHANGE } from 'react-router-redux';
 // import { normalize } from 'normalizr';
 import * as Api from '../../services/api';
@@ -21,15 +13,9 @@ function* authorize(user) {
     yield call(LocalStorage.saveItem, 'token', res.token);
     yield call(LocalStorage.saveItem, 'orgID', res.user.orgID);
     yield call(LocalStorage.saveItem, 'user', res.user);
-    // yield call(LocalStorage.saveItem, 'isLoggedIn', true);
     yield put({ type: types.LOGIN_SUCCESS, res });
   } catch (error) {
     yield put({ type: types.LOGIN_FAILURE, error });
-  } finally {
-    if (yield cancelled()) {
-      // reducer will clear out login_progress on logout request
-      // So this block is not exactly required
-    }
   }
 }
 
@@ -54,9 +40,6 @@ function* loginFlow() {
     if (action.type === types.LOGOUT_REQUEST) {
       yield cancel(task);
     }
-    // yield call(LocalStorage.clearItem, 'token');
-    // yield call(LocalStorage.clearItem, 'orgID');
-    // yield call(LocalStorage.clearItem, 'user');
   }
 }
 
