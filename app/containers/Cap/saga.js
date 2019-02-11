@@ -125,7 +125,6 @@ export function* fetchUserInfo() {
 }
 
 function* watchForOrgChange() {
-  console.log('org change watcher');
   yield takeLatest(types.SWITCH_ORG_REQUEST, switchOrg);
 }
 

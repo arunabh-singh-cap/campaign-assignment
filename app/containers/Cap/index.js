@@ -18,6 +18,7 @@ import { isEqual, find, forEach, isEmpty } from 'lodash';
 import { injectIntl } from 'react-intl';
 import CapSpinner from '@capillarytech/cap-react-ui-library/CapSpinner';
 import injectSaga from '../../utils/injectSaga';
+import componentRoutes from './routes';
 import { makeSelectCap, makeSelectMenuData } from './selectors';
 import reducer from './reducer';
 import sagas from './saga';
@@ -25,30 +26,19 @@ import messages from './messages';
 import TopBar from '../../components/TopBar';
 import * as actions from './actions';
 import config from '../../config/app';
+
 const gtm = window.dataLayer || [];
 
 const CapWrapper = styled.div`
-  margin: 0 auto;
+  flex: auto;
   display: flex;
-  min-height: 100%;
-  width: calc(100% - 280px);
   padding: 0;
-  flex-direction: column;
 `;
 
 const RenderRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => <Component {...props} />} />
 );
-
 export class Cap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      routes: [],
-      selectedProduct: '',
-    };
-  }
-
   componentDidMount() {
     if (!this.props.Global.fetching_userdata) {
       this.props.actions.getUserData();
@@ -106,16 +96,7 @@ export class Cap extends React.Component {
     }
     const { currentOrgDetails } = nextProps.Global;
     if (!isEqual(currentOrgDetails, this.props.Global.currentOrgDetails)) {
-      let selectedProduct;
-      const { path } = nextProps.match;
-      forEach(currentOrgDetails.module_details, module => {
-        if (module.url === `${path}/index`) {
-          this.props.actions.getMenuData(module.code);
-        }
-      });
-      if (selectedProduct) {
-        this.setState({ selectedProduct });
-      }
+      this.props.actions.getMenuData('org');
     }
   }
 
@@ -180,36 +161,21 @@ export class Cap extends React.Component {
   };
 
   handleProductChange = (value, option) => {
-    const { path } = this.props.match;
+    const { match, history } = this.props;
+    const { path } = match;
     if (option.url !== `${path}/index`) {
-      this.props.history.push(option.url);
+      history.push(option.url);
     }
   };
 
-  getParsedMenuData = data =>
-    Object.entries(data).map(([key, value]) => {
-      if (value.url) {
-        return {
-          title: value.name,
-          key,
-          link: value.url,
-        };
-      }
-      return {
-        title: key,
-        key,
-        children: this.getParsedMenuData(value),
-      };
-    });
+  onSideBarLinkClick = item => {
+    const { history } = this.props;
+    history.push(item.link);
+  };
 
   render() {
     const userData = this.props.Global;
     const { menuData } = this.props;
-    let parsedMenuData = [];
-    if (menuData.status === 'success') {
-      parsedMenuData = this.getParsedMenuData(menuData.data._actions);
-    }
-    console.log(parsedMenuData);
     const query = new URLSearchParams(this.props.location.search);
     const type = query.get('type');
     const proxyOrgList = [];
@@ -256,35 +222,31 @@ export class Cap extends React.Component {
           <title>Cap</title>
           <meta name="description" content="Description of Cap" />
         </Helmet>
-        <div className="wrapper">
-          {loggedIn && type !== 'embedded' ? (
-            <TopBar
-              proxyOrgList={proxyOrgList}
-              userName={userName}
-              orgID={defaultOrgId.toString()}
-              changeOrg={this.changeOrg}
-              navigateToDashboard={navigateToDashboard}
-              logout={this.logout}
-              productMenuData={productMenuData}
-              baseUrl={this.props.match.path}
-              selectedProduct={this.state.selectedProduct}
-              handleProductChange={this.handleProductChange}
-            />
-          ) : (
-            ''
-          )}
-          <CapSideBar sidebarItems={parsedMenuData} />
-          <div className="main">
-            <CapWrapper>
-              <Switch>
-                {/* <Route path={`${this.props.match.path}/`} component={Main} /> */}
-                {this.state.routes.map(routeProps => (
-                  <RenderRoute {...routeProps} key={routeProps.path} />
-                ))}
-              </Switch>
-            </CapWrapper>
-          </div>
-        </div>
+        {loggedIn && type !== 'embedded' ? (
+          <TopBar
+            proxyOrgList={proxyOrgList}
+            userName={userName}
+            orgID={defaultOrgId.toString()}
+            changeOrg={this.changeOrg}
+            navigateToDashboard={navigateToDashboard}
+            logout={this.logout}
+            productMenuData={productMenuData}
+            baseUrl={this.props.match.path}
+            selectedProduct="masters"
+            handleProductChange={this.handleProductChange}
+          />
+        ) : null}
+        <CapWrapper>
+          <CapSideBar
+            sidebarItems={menuData}
+            onLinkClick={this.onSideBarLinkClick}
+          />
+          <Switch>
+            {componentRoutes.map(routeProps => (
+              <RenderRoute {...routeProps} key={routeProps.path} />
+            ))}
+          </Switch>
+        </CapWrapper>
       </CapSpinner>
     );
   }
@@ -296,7 +258,7 @@ Cap.propTypes = {
   history: PropTypes.object,
   actions: PropTypes.object,
   location: PropTypes.object,
-  menuData: PropTypes.object,
+  menuData: PropTypes.array,
   intl: PropTypes.object,
 };
 
@@ -317,7 +279,7 @@ const withConnect = connect(
 );
 
 const withReducer = injectReducer({ key: 'cap', reducer });
-// const withSaga = sagas.map((saga, index) => injectSaga({ key: `cap-${index}`, saga }));
+// const withSaga = sagas.map((saga, index) => injectSaga({key: `cap-${index}`, saga }));
 const withSaga = sagas.map((saga, index) =>
   injectSaga({ key: `cap-${index}`, saga }),
 );

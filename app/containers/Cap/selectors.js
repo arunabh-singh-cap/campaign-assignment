@@ -15,6 +15,23 @@ const selectCap = state => state.get('cap', initialState);
  * Other specific selectors
  */
 
+function getParsedMenuData(data) {
+  return Object.entries(data).map(([key, value]) => {
+    if (value.url) {
+      return {
+        title: value.name,
+        key,
+        link: value.url,
+      };
+    }
+    return {
+      title: key,
+      key,
+      children: getParsedMenuData(value),
+    };
+  });
+}
+
 const makeSelectCap = () =>
   createSelector(selectCap, capstate => capstate.toJS());
 
@@ -25,7 +42,14 @@ const makeSelectUserLoading = () =>
   createSelector(selectCap, capstate => capstate.get('loadingUser'));
 
 const makeSelectMenuData = () =>
-  createSelector(selectCap, capstate => capstate.get('menuData').toJS());
+  createSelector(selectCap, capstate => {
+    const menuData = capstate.get('menuData').toJS();
+    let parsedMenuData = [];
+    if (menuData.status === 'success') {
+      parsedMenuData = getParsedMenuData(menuData.data._actions);
+    }
+    return parsedMenuData;
+  });
 
 export {
   selectCap,

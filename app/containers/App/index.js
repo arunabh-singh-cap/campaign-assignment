@@ -8,7 +8,7 @@
  */
 
 import React from 'react'; // eslint-disable-line no-unused-vars
-import { Switch, Route, Router } from 'react-router-dom';
+import { Switch, Route, Router, Redirect } from 'react-router-dom';
 import history from 'utils/history';
 
 import Cap from '../Cap';
@@ -28,12 +28,13 @@ export default function App() {
     <div>
       <Router history={history}>
         <Switch>
+          <RenderRoute exact path="/login" component={Login} />
           <RenderRoute
             path={publicPath}
             component={Protected}
             key={publicPath}
           />
-          <RenderRoute exact path="/login" component={Login} />
+          <Redirect exact from="/" to={publicPath} push />
           <RenderRoute component={NotFoundPage} />
         </Switch>
       </Router>

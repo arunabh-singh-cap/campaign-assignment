@@ -1,3 +1,3 @@
 module.exports = {
-  publicPath: '/org',
+  publicPath: '/org/index',
 };
