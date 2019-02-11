@@ -68,8 +68,7 @@ export class Cap extends React.Component {
       !isEqual(
         nextProps.Global.changeProxyOrgSuccess,
         this.props.Global.changeProxyOrgSuccess,
-      ) &&
-      !this.state.switchedOrg
+      )
     ) {
       this.navigateToDashboard();
     }
@@ -116,10 +115,6 @@ export class Cap extends React.Component {
     return gtmData;
   };
 
-  componentWillUnmount() {
-    this.setState({ switchedOrg: false });
-  }
-
   handleRemoveMessage = messageIndex => {
     this.props.actions.removeMessageFromQueue(messageIndex);
   };
@@ -154,10 +149,6 @@ export class Cap extends React.Component {
 
   changeOrg = orgId => {
     this.props.actions.changeOrg(orgId);
-  };
-
-  changeOu = ouId => {
-    this.props.actions.changeOu(ouId);
   };
 
   handleProductChange = (value, option) => {
@@ -237,10 +228,12 @@ export class Cap extends React.Component {
           />
         ) : null}
         <CapWrapper>
-          <CapSideBar
-            sidebarItems={menuData}
-            onLinkClick={this.onSideBarLinkClick}
-          />
+          {menuData.length > 0 && (
+            <CapSideBar
+              sidebarItems={menuData}
+              onLinkClick={this.onSideBarLinkClick}
+            />
+          )}
           <Switch>
             {componentRoutes.map(routeProps => (
               <RenderRoute {...routeProps} key={routeProps.path} />

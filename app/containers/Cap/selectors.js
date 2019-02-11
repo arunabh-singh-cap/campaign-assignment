@@ -45,7 +45,7 @@ const makeSelectMenuData = () =>
   createSelector(selectCap, capstate => {
     const menuData = capstate.get('menuData').toJS();
     let parsedMenuData = [];
-    if (menuData.status === 'success') {
+    if (menuData.status === 'success' && menuData.data) {
       parsedMenuData = getParsedMenuData(menuData.data._actions);
     }
     return parsedMenuData;

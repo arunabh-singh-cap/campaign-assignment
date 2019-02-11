@@ -25,6 +25,7 @@ function* switchOrg({ orgID }) {
     const res = yield call(Api.changeProxyOrg, orgID);
     yield [
       put({ type: types.SWITCH_ORG_SUCCESS, orgID, isSuccess: res.success }),
+      put({ type: types.GET_USER_DATA_REQUEST }),
     ];
   } catch (error) {
     yield put({ type: types.SWITCH_ORG_FAILURE, error });
