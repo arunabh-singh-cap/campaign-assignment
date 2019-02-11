@@ -5,12 +5,6 @@ import { withRouter } from 'react-router-dom';
 import { loadItem } from 'services/localStorageApi';
 
 class TopBar extends React.Component {
-  componentDidUpdate(prevProps) {
-    if (prevProps.orgID !== this.props.orgID) {
-      this.props.navigateToDashboard();
-    }
-  }
-
   handleOrgChange = orgId => {
     const selectedOrg = loadItem('orgID');
     if (selectedOrg !== orgId) {
@@ -59,8 +53,6 @@ TopBar.propTypes = {
   productMenuData: PropTypes.array,
   handleProductChange: PropTypes.func,
   selectedProduct: PropTypes.string,
-  orgID: PropTypes.string,
-  navigateToDashboard: PropTypes.func,
   changeOrg: PropTypes.func,
   logout: PropTypes.func,
 };

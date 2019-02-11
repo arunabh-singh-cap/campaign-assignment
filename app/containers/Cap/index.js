@@ -23,6 +23,7 @@ import { makeSelectCap, makeSelectMenuData } from './selectors';
 import reducer from './reducer';
 import sagas from './saga';
 import messages from './messages';
+import NotFoundPage from '../NotFoundPage/Loadable';
 import TopBar from '../../components/TopBar';
 import * as actions from './actions';
 import config from '../../config/app';
@@ -39,6 +40,13 @@ const RenderRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => <Component {...props} />} />
 );
 export class Cap extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedMenuItem: '',
+    };
+  }
+
   componentDidMount() {
     if (!this.props.Global.fetching_userdata) {
       this.props.actions.getUserData();
@@ -161,22 +169,19 @@ export class Cap extends React.Component {
 
   onSideBarLinkClick = item => {
     const { history } = this.props;
-    history.push(item.link);
+    this.setState({ selectedMenuItem: item.key });
+    history.push(item.link, { code: item.key });
   };
 
   render() {
     const userData = this.props.Global;
     const { menuData } = this.props;
-    const query = new URLSearchParams(this.props.location.search);
-    const type = query.get('type');
+    const { selectedMenuItem } = this.state;
     const proxyOrgList = [];
-    let defaultOrgName = '';
-    let defaultOrgId = '';
     let userName = '';
-    const { navigateToDashboard } = this;
     if (userData && userData.user && userData.user !== '') {
-      defaultOrgName = userData.user.orgName;
-      defaultOrgId = userData.user.orgID;
+      const defaultOrgName = userData.user.orgName;
+      const defaultOrgId = userData.user.orgID;
       proxyOrgList.push({ label: defaultOrgName, value: defaultOrgId });
       const orgList = userData.user.proxyOrgList;
       if (!isEmpty(orgList)) {
@@ -207,19 +212,19 @@ export class Cap extends React.Component {
         });
       });
     }
+
     return (
       <CapSpinner spinning={this.props.Global.fetching_userdata}>
         <Helmet>
           <title>Cap</title>
           <meta name="description" content="Description of Cap" />
         </Helmet>
-        {loggedIn && type !== 'embedded' ? (
+        {loggedIn ? (
           <TopBar
             proxyOrgList={proxyOrgList}
             userName={userName}
-            orgID={defaultOrgId.toString()}
             changeOrg={this.changeOrg}
-            navigateToDashboard={navigateToDashboard}
+            navigateToDashboard={this.navigateToDashboard}
             logout={this.logout}
             productMenuData={productMenuData}
             baseUrl={this.props.match.path}
@@ -232,12 +237,15 @@ export class Cap extends React.Component {
             <CapSideBar
               sidebarItems={menuData}
               onLinkClick={this.onSideBarLinkClick}
+              selectedMenuItem={selectedMenuItem}
+              defaultActiveKey=""
             />
           )}
           <Switch>
             {componentRoutes.map(routeProps => (
               <RenderRoute {...routeProps} key={routeProps.path} />
             ))}
+            <RenderRoute component={NotFoundPage} />
           </Switch>
         </CapWrapper>
       </CapSpinner>

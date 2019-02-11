@@ -34,7 +34,7 @@ export default function App() {
             component={Protected}
             key={publicPath}
           />
-          <Redirect exact from="/" to={publicPath} push />
+          <Redirect exact from="/" to={`${publicPath}/index`} push />
           <RenderRoute component={NotFoundPage} />
         </Switch>
       </Router>
