@@ -24,6 +24,7 @@ class TopBar extends React.Component {
       productMenuData,
       selectedProduct,
       handleProductChange,
+      menuProps,
     } = this.props;
     const selectedOrg = loadItem('orgID');
     return (
@@ -40,6 +41,7 @@ class TopBar extends React.Component {
           handleItemChange: handleProductChange,
           selectPlaceholder: 'Select Product',
         }}
+        menuProps={menuProps}
         userName={userName}
         onLogoutClick={this.logout}
       />
@@ -54,6 +56,7 @@ TopBar.propTypes = {
   handleProductChange: PropTypes.func,
   selectedProduct: PropTypes.string,
   changeOrg: PropTypes.func,
+  menuProps: PropTypes.object,
   logout: PropTypes.func,
 };
 
