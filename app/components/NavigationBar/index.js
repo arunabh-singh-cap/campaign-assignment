@@ -14,10 +14,13 @@ import NotFoundPage from '../../containers/NotFoundPage';
 import TopBar from '../TopBar';
 
 const CapWrapper = styled.div`
-  flex: auto;
-  display: flex;
   padding: 0;
   background-color: #ffffff;
+`;
+
+const ComponentWrapper = styled.div`
+  max-width: 1140px;
+  margin: 0 auto;
 `;
 
 const RenderRoute = ({ component: Component, ...rest }) => (
@@ -39,10 +42,10 @@ class NavigationBar extends React.Component {
   };
 
   handleProductChange = (value, option) => {
-    const { match, history } = this.props;
+    const { match } = this.props;
     const { path } = match;
     if (option.url !== `${path}/index`) {
-      history.push(option.url);
+      window.location.pathname = option.url;
     }
   };
 
@@ -87,12 +90,23 @@ class NavigationBar extends React.Component {
     return productMenuData;
   };
 
+  onSettingsClick = () => {
+    const { settingsUrl } = this.props;
+    if (settingsUrl) {
+      window.location.pathname = settingsUrl;
+    }
+  };
+
+  onTopMenuClick = item => {
+    const { history } = this.props;
+    history.push(item.link, { code: item.key });
+  };
+
   render() {
     const {
       componentRoutes,
       menuData,
       menuItemsPosition,
-      topMenuProps,
       logout,
       changeOrg,
     } = this.props;
@@ -101,7 +115,13 @@ class NavigationBar extends React.Component {
     const { selectedMenuItem } = this.state;
     let customTopBarProps = {};
     if (menuItemsPosition === 'top') {
-      customTopBarProps = { menuProps: topMenuProps };
+      customTopBarProps = {
+        menuProps: {
+          items: menuData,
+          selectedItem: '',
+          onMenuItemClick: this.onTopMenuClick,
+        },
+      };
     }
     return (
       <React.Fragment>
@@ -110,8 +130,9 @@ class NavigationBar extends React.Component {
           userName={userName}
           changeOrg={changeOrg}
           logout={logout}
+          onSettingsClick={this.onSettingsClick}
           productMenuData={productMenuData}
-          selectedProduct="masters"
+          selectedProduct="campaigns"
           handleProductChange={this.handleProductChange}
           {...customTopBarProps}
         />
@@ -123,13 +144,17 @@ class NavigationBar extends React.Component {
               selectedMenuItem={selectedMenuItem}
               defaultActiveKey=""
             />
-          ) : null}
-          <Switch>
-            {componentRoutes.map(routeProps => (
-              <RenderRoute {...routeProps} key={routeProps.path} />
-            ))}
-            <RenderRoute component={NotFoundPage} />
-          </Switch>
+          ) : (
+            ''
+          )}
+          <ComponentWrapper>
+            <Switch>
+              {componentRoutes.map(routeProps => (
+                <RenderRoute {...routeProps} key={routeProps.path} />
+              ))}
+              <RenderRoute component={NotFoundPage} />
+            </Switch>
+          </ComponentWrapper>
         </CapWrapper>
       </React.Fragment>
     );
@@ -143,6 +168,7 @@ NavigationBar.propTypes = {
   menuItemsPosition: PropTypes.string,
   logout: PropTypes.func,
   changeOrg: PropTypes.func,
+  settingsUrl: PropTypes.string,
 };
 
 export default withRouter(NavigationBar);

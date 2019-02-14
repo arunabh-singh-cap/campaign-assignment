@@ -121,7 +121,7 @@ export class Cap extends React.Component {
   logout = () => {
     if (process.env.NODE_ENV === 'production') {
       const originUrl = window.location.origin;
-      const logoutpage = `${originUrl}/logout`;
+      const logoutpage = `${originUrl}${config.production.logout_url}`;
       localStorage.removeItem('token');
       localStorage.removeItem('orgID');
       localStorage.removeItem('ouId');

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CapTopBar } from '@capillarytech/cap-ui-library';
-import { withRouter } from 'react-router-dom';
 import { loadItem } from 'services/localStorageApi';
 
 class TopBar extends React.Component {
@@ -60,4 +59,4 @@ TopBar.propTypes = {
   logout: PropTypes.func,
 };
 
-export default withRouter(TopBar);
+export default TopBar;
