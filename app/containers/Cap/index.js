@@ -10,7 +10,6 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
 import { compose, bindActionCreators } from 'redux';
-import injectReducer from 'utils/injectReducer';
 import { isEqual, find } from 'lodash';
 import { injectIntl } from 'react-intl';
 import CapSpinner from '@capillarytech/cap-react-ui-library/CapSpinner';
@@ -18,7 +17,6 @@ import injectSaga from '../../utils/injectSaga';
 import componentRoutes from './routes';
 import NavigationBar from '../../components/NavigationBar';
 import { makeSelectCap, makeSelectMenuData } from './selectors';
-import reducer from './reducer';
 import sagas from './saga';
 import * as actions from './actions';
 import config from '../../config/app';
@@ -185,14 +183,11 @@ const withConnect = connect(
   mapDispatchToProps,
 );
 
-const withReducer = injectReducer({ key: 'cap', reducer });
-// const withSaga = sagas.map((saga, index) => injectSaga({key: `cap-${index}`, saga }));
 const withSaga = sagas.map((saga, index) =>
   injectSaga({ key: `cap-${index}`, saga }),
 );
 
 export default compose(
-  withReducer,
   ...withSaga,
   withConnect,
 )(injectIntl(Cap));

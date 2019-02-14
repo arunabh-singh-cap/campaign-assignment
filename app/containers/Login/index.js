@@ -14,10 +14,8 @@ import config from '../../config/app';
 import LoginForm from '../../components/LoginForm';
 import * as actions from '../Cap/actions';
 import loaderGif from '../../assets/loading_img.gif';
-import reducer from '../Cap/reducer';
 import sagas from '../Cap/saga';
 import injectSaga from '../../utils/injectSaga';
-import injectReducer from '../../utils/injectReducer';
 
 const logo = require('./assets/images/capillary_logo.png');
 
@@ -135,12 +133,10 @@ const withConnect = connect(
   mapDispatchToProps,
 );
 
-const withReducer = injectReducer({ key: 'cap', reducer });
-// const withSaga = sagas.map((saga, index) => injectSaga({ key: `cap-${index}`, saga }));
 const withSaga = sagas.map((saga, index) =>
   injectSaga({ key: `cap-${index}`, saga }),
 );
 
-export default compose.apply(null, [withReducer, ...withSaga, withConnect])(
+export default compose.apply(null, [...withSaga, withConnect])(
   injectIntl(withRouter(Login)),
 );

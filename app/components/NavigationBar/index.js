@@ -14,6 +14,7 @@ import NotFoundPage from '../../containers/NotFoundPage';
 import TopBar from '../TopBar';
 
 const CapWrapper = styled.div`
+  display: flex;
   padding: 0;
   background-color: #ffffff;
 `;
