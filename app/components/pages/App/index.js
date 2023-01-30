@@ -18,7 +18,7 @@ import Login from '../Login';
 import NotFoundPage from '../NotFoundPage';
 
 import GlobalStyle from '../../../global-styles';
-import { publicPath } from '../../../config/path';
+import { publicPath, campaignPath } from '../../../config/path';
 import config from '../../../config/app';
 
 import RenderRoute from '../../atoms/RenderRoute';
@@ -37,6 +37,11 @@ export const App = () => (
       <Switch>
         <RenderRoute exact path={loginUrl} component={Login} />
         <RenderRoute path={publicPath} component={Protected} key={publicPath} />
+        <RenderRoute
+          path={campaignPath}
+          component={Protected}
+          key={publicPath}
+        />
         <RenderRoute component={NotFoundPage} />
       </Switch>
     </ConnectedRouter>

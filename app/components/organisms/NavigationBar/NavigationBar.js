@@ -17,7 +17,7 @@ import * as path from '../../../config/path';
 import * as constants from './constants';
 
 const { publicPath } = path;
-const { DEFAULT_MODULE } = constants;
+const { DEFAULT_MODULE, DEFAULT_MODULE_CAMPAIGN } = constants;
 
 export const NavigationBar = ({
   className,
@@ -120,6 +120,11 @@ export const NavigationBar = ({
   const topbarIcons = getTopbarIcons();
   const dropdownMenuProps = getDropdownMenu();
 
+  let selectedMenuData = DEFAULT_MODULE;
+  if (window.location.href.includes('/campaigns/ui/list')) {
+    selectedMenuData = DEFAULT_MODULE_CAMPAIGN;
+  }
+
   return (
     <CapNavigation
       className={className}
@@ -128,7 +133,7 @@ export const NavigationBar = ({
       loadStorageItem={loadItem}
       changeOrgEntity={changeOrgEntity}
       topbarMenuData={topbarMenuDataModified}
-      topbarSelectedMenuData={[DEFAULT_MODULE]}
+      topbarSelectedMenuData={[selectedMenuData]}
       dropdownMenuProps={dropdownMenuProps}
       topbarIcons={topbarIcons}
       sidebarMenuData={sidebarMenuData}

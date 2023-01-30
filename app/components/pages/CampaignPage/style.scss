@@ -1,0 +1,52 @@
+@import "@capillarytech/cap-ui-library/styles/_variables.scss";
+
+.cap-banner-wrapper {
+    border-bottom: 1px solid $CAP_G07;
+    margin-top: -25px;
+    .cap-banner {
+        border: none;
+        margin-top: -10px;
+        padding: 0;
+    }
+}
+
+.cap-performance-wrapper {
+    margin-top: 24px;
+    .timeline-row {
+        padding: 14px 0;       
+        .time-tags {
+            background-color: transparent;
+            height: 0;
+            padding: 10px 8px;
+            &.checked {
+                background-color: $CAP_G09;
+                color: $FONT_COLOR_05;
+            }  
+        }
+        .time-tags:hover {
+            background-color: $CAP_G09;
+        }
+    }
+    .credit-icon {
+        font-size: 16px;
+        padding-left: 2px;
+        vertical-align: 0;
+        color: #2466ea;
+    }
+}
+
+.cap-tab-wrapper {
+    margin-top: 32px;
+}
+
+.cap-search-wrapper {
+    margin-bottom: 18px;
+}
+
+.cam-filter-row {
+    margin-top: 18px;
+}
+
+.cap-newcamp-btn {
+    float: right;
+}
