@@ -76,7 +76,7 @@ const CampaignPage = ({
     [campaignsListData],
   );
 
-  const CapBannerSection = () => (
+  const getCapBannerSection = () => (
     <div className="cap-banner-wrapper">
       <CapBanner
         iconProps={{
@@ -104,7 +104,7 @@ const CampaignPage = ({
     </div>
   );
 
-  const CapPerformanceSection = () => (
+  const getCapPerformanceSection = () => (
     <div className="cap-performance-wrapper">
       <CapRow>
         <CapColumn span={19}>
@@ -150,7 +150,7 @@ const CampaignPage = ({
     </div>
   );
 
-  const CapTabSection = () => (
+  const getCapTabSection = () => (
     <div className="cap-tab-wrapper">
       <CapTab panes={CapTabsOptions} />
     </div>
@@ -186,7 +186,7 @@ const CampaignPage = ({
     }
   };
 
-  const CapSearchSection = () => (
+  const getCapSearchSection = () => (
     <div className="cap-search-wrapper">
       <CapHeading type="h2">{formatMessage(messages.searchHeading)}</CapHeading>
       <CapRow className="cam-filter-row" gutter={24}>
@@ -232,7 +232,7 @@ const CampaignPage = ({
   );
 
   // Function to handle only the Cap Table related data
-  const CapTableSection = () => {
+  const getCapTableSection = () => {
     const tableColsTree = TableColumns(handleCreateCampaign);
     return (
       <CapSpin spinning={spinningState}>
@@ -290,11 +290,11 @@ const CampaignPage = ({
 
   return (
     <>
-      <CapBannerSection />
-      <CapPerformanceSection />
-      <CapTabSection />
-      <CapSearchSection />
-      <CapTableSection />
+      {getCapBannerSection()}
+      {getCapPerformanceSection()}
+      {getCapTabSection()}
+      {getCapSearchSection()}
+      {getCapTableSection()}
     </>
   );
 };

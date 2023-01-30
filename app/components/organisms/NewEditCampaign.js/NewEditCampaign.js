@@ -25,7 +25,6 @@ const NewEditCampaign = ({
   handleCreateCampaign,
   saveCampaignAction,
   editCampaignData,
-  getCampaignsList,
 }) => {
   const [spinningState, toggleSpinning] = useState(false);
   const [campaignId, setCampaignId] = useState('');
@@ -55,11 +54,7 @@ const NewEditCampaign = ({
         date: dateRange[1],
       }),
     });
-    getCampaignsList(0);
-    setTimeout(() => {
-      toggleSpinning(false);
-      handleCreateCampaign('Save');
-    }, 500);
+    handleCreateCampaign('Save');
   };
 
   return (
