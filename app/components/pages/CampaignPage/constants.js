@@ -59,6 +59,18 @@ const performanceChildrens = [
   },
 ];
 
+const CampaignStatus = (startDate, endDate) => {
+  let statusMsg = '';
+  if (moment().isBefore(moment(startDate))) {
+    statusMsg = 'upcoming';
+  } else if (moment().isAfter(moment(endDate))) {
+    statusMsg = 'ended';
+  } else if (moment().isBetween(moment(startDate), moment(endDate))) {
+    statusMsg = 'live';
+  }
+  return statusMsg;
+};
+
 const performanceChildrensColumns = performanceChildrens.map(child => ({
   title: (
     <>
@@ -144,7 +156,7 @@ export const TableColumns = handleCreateCampaign => [
             Campaign duration details
           </CapLabel>
           <CapLabel type="label2" style={{ marginTop: '8px' }}>
-            Ended/Live
+            {CampaignStatus(startDate, endDate)}
           </CapLabel>
         </>
       );
