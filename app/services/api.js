@@ -243,3 +243,8 @@ export const saveCampaign = payload => {
     getAPICallObject('POST', payload, false, undefined, true),
   );
 };
+
+export const editCampaign = (campaignId, payload) => {
+  const url = `https://crm-nightly-new.cc.capillarytech.com/iris/v2/campaigns/${campaignId}`;
+  return request(url, getAPICallObject('PUT', payload, false, undefined, true));
+};

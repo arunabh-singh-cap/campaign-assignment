@@ -7,6 +7,7 @@ import {
   CapLabel,
   CapRow,
   CapTooltipWithInfo,
+  CapTooltip,
 } from '@capillarytech/cap-ui-library';
 import moment from 'moment';
 
@@ -81,7 +82,7 @@ const performanceChildrensColumns = performanceChildrens.map(child => ({
   render: () => <>-</>,
 }));
 
-export const TableColumns = [
+export const TableColumns = handleCreateCampaign => [
   {
     title: (
       <CapHeader
@@ -161,9 +162,25 @@ export const TableColumns = [
     dataIndex: 'act',
     key: 'act',
     width: '7%',
-    render: () => (
+    render: (text, campaign) => (
       <>
-        <CapIcon type="more" />
+        <CapTooltip
+          infoIconProps={{ style: { marginLeft: '2px', position: 'absolute' } }}
+          title="Edit"
+        >
+          <CapIcon
+            type="more"
+            onClick={() =>
+              handleCreateCampaign(
+                'Edit',
+                campaign.campaignId,
+                campaign.name,
+                campaign.startDate,
+                campaign.endDate,
+              )
+            }
+          />
+        </CapTooltip>
       </>
     ),
   },

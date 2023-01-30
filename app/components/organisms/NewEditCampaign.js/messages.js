@@ -9,17 +9,23 @@ const NewEditCampaignMessages = {
     orgHeading: {
       id: `${prefix}.orgHeading`,
       defaultMessage: 'Which organisation is this campaign for?',
+      disabled: false,
     },
     orgDesp: {
       id: `${prefix}.orgDesp`,
       defaultMessage:
         'Campaigns will default to the parent organisation. Change this to sub-organisation to run campaigns explicitly for a particular sub-organisation.',
+      disabled: false,
     },
     orgName: {
       id: `${prefix}.orgName`,
       defaultMessage: 'Capillary Technologies',
     },
-    changeOrg: { id: `${prefix}.changeOrg`, defaultMessage: '+ Change' },
+    changeOrg: {
+      id: `${prefix}.changeOrg`,
+      defaultMessage: '+ Change',
+      show: true,
+    },
     campaignNameHeading: {
       id: `${prefix}.newCampaignHeading`,
       defaultMessage: 'Campaign name',
@@ -70,17 +76,23 @@ const NewEditCampaignMessages = {
     orgHeading: {
       id: `${prefix}.orgHeading`,
       defaultMessage: 'Which organisation is this campaign for?',
+      disabled: true,
     },
     orgDesp: {
       id: `${prefix}.orgDesp`,
       defaultMessage:
         'Campaigns will default to the parent organisation. Change this to sub-organisation to run campaigns explicitly for a particular sub-organisation.',
+      disabled: true,
     },
     orgName: {
       id: `${prefix}.orgName`,
       defaultMessage: 'Capillary Technologies',
     },
-    changeOrg: { id: `${prefix}.changeOrg`, defaultMessage: '+ Change' },
+    changeOrg: {
+      id: `${prefix}.changeOrg`,
+      defaultMessage: '+ Change',
+      show: false,
+    },
     campaignNameHeading: {
       id: `${prefix}.newCampaignHeading`,
       defaultMessage: 'Campaign name',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment-timezone';
 import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
 import debounce from 'lodash/debounce';
 import injectSaga from 'utils/injectSaga';
@@ -52,6 +53,7 @@ const CampaignPage = ({
   const [searchValue, updateSearchValue] = useState('');
   const [spinningState, toggleSpinning] = useState(true);
   const [redirectCreateCampaignPage, toggleCreateCampaignPage] = useState('');
+  const [editCampaignData, setCampaignData] = useState({});
 
   const { campaignsList, totalCount } = campaignsListData;
 
@@ -73,6 +75,7 @@ const CampaignPage = ({
     },
     [campaignsListData],
   );
+
   const CapBannerSection = () => (
     <div className="cap-banner-wrapper">
       <CapBanner
@@ -116,6 +119,7 @@ const CampaignPage = ({
           <CapRow className="timeline-row">
             {CapTags.map(tagValue => (
               <CapTag
+                key={`campaignPage-${tagValue}`}
                 className={`time-tags ${tagValue === '1M' ? 'checked' : ''}`}
               >
                 {tagValue}
@@ -156,7 +160,7 @@ const CampaignPage = ({
   const searchListener = debounce(() => {
     if (searchValue.length >= 3) {
       toggleSpinning(true);
-      actions.searchCampaignList(searchValue);
+      actions.searchCampaignList('BY_NAME', searchValue, undefined, undefined);
     }
   }, 1000);
 
@@ -167,6 +171,19 @@ const CampaignPage = ({
   const handleSearchCampaign = e => {
     updateSearchValue(e.target.value);
     searchListener();
+  };
+
+  const searchOnDates = e => {
+    if (e[1] !== null) {
+      const [startDate, endDate] = e;
+
+      actions.searchCampaignList(
+        'BY_DATE',
+        undefined,
+        Math.floor(moment(startDate.clone()).unix() / 86400),
+        Math.floor(moment(endDate.clone()).unix() / 86400),
+      );
+    }
   };
 
   const CapSearchSection = () => (
@@ -184,7 +201,15 @@ const CampaignPage = ({
           />
         </CapColumn>
         <CapColumn span={7}>
-          <CapDateRangePicker />
+          <CapDateRangePicker
+            enableOutsideDays
+            isOutsideRange={() => false}
+            startDateId="campaignFiltersStart"
+            endDateId="campaignFiltersEnd"
+            onChange={e => {
+              searchOnDates(e);
+            }}
+          />
         </CapColumn>
         <CapDivider
           type="vertical"
@@ -207,40 +232,58 @@ const CampaignPage = ({
   );
 
   // Function to handle only the Cap Table related data
-  const CapTableSection = () => (
-    <CapSpin spinning={spinningState}>
-      {totalCount && (
-        <CapLabel type="label7" style={{ margin: '20px 0 15px' }}>
-          {totalCount} matching results
-        </CapLabel>
-      )}
-      <div className="campaign-table">
-        <CapTable
-          columns={TableColumns}
-          dataSource={campaignList}
-          infinteScroll
-          scroll={{ y: 645 }}
-        />
-      </div>
-    </CapSpin>
-  );
+  const CapTableSection = () => {
+    const tableColsTree = TableColumns(handleCreateCampaign);
+    return (
+      <CapSpin spinning={spinningState}>
+        {totalCount && (
+          <CapLabel type="label7" style={{ margin: '20px 0 15px' }}>
+            {totalCount} matching results
+          </CapLabel>
+        )}
+        <div className="campaign-table">
+          <CapTable
+            columns={tableColsTree}
+            dataSource={campaignList}
+            infinteScroll
+            scroll={{ y: 645 }}
+          />
+        </div>
+      </CapSpin>
+    );
+  };
 
-  const handleCreateCampaign = type => {
+  const handleCreateCampaign = (
+    type,
+    campaignId,
+    campaignName,
+    startDate,
+    endDate,
+  ) => {
     switch (type) {
-      case 'New' || 'Edit':
+      case 'New':
         toggleCreateCampaignPage(type);
+        break;
+      case 'Edit':
+        toggleCreateCampaignPage(type);
+        setCampaignData({ campaignId, campaignName, startDate, endDate });
+        break;
+      case 'Save':
+        window.location.reload();
         break;
       default:
         toggleCreateCampaignPage('');
     }
   };
 
-  if (redirectCreateCampaignPage === 'New') {
+  if (redirectCreateCampaignPage !== '') {
     return (
       <NewEditCampaign
-        type="New"
+        type={redirectCreateCampaignPage}
+        editCampaignData={editCampaignData}
         handleCreateCampaign={handleCreateCampaign}
         saveCampaignAction={actions.saveNewCampaign}
+        getCampaignsList={actions.getCampaignsList}
       />
     );
   }

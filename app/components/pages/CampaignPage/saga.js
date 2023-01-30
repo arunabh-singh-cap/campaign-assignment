@@ -31,14 +31,30 @@ export function* getCampaignsListMethod({ sheetNumber }) {
   }
 }
 
-export function* searchCampaignListMethod({ searchValue }) {
+export function* searchCampaignListMethod({
+  searchType,
+  searchValue,
+  startDate,
+  endDate,
+}) {
   try {
-    const payload = {
-      limit: 10,
-      offset: 0,
-      messageStatsRequired: true,
-      search: searchValue,
-    };
+    let payload = {};
+    if (searchType === 'BY_NAME') {
+      payload = {
+        limit: 10,
+        offset: 0,
+        messageStatsRequired: true,
+        search: searchValue,
+      };
+    } else if (searchType === 'BY_DATE') {
+      payload = {
+        limit: 10,
+        offset: 0,
+        messageStatsRequired: true,
+        startDate,
+        endDate,
+      };
+    }
     const res = yield call(Api.getCampaignsList, payload);
     const { campaignsResponses = [], totalCount } = get(res, 'entity', {});
     yield put({ type: 'UPDATE_CAMPAIGN_LIST', campaignsResponses, totalCount });
@@ -47,7 +63,12 @@ export function* searchCampaignListMethod({ searchValue }) {
   }
 }
 
-export function* saveCampaign({ campaignName, startDate, endDate }) {
+export function* saveCampaign({
+  campaignId,
+  campaignName,
+  startDate,
+  endDate,
+}) {
   try {
     const payload = {
       endDate,
@@ -58,9 +79,10 @@ export function* saveCampaign({ campaignName, startDate, endDate }) {
       campaignsAttached: [],
       gaEnabled: false,
     };
-    const res = yield call(Api.saveCampaign, payload);
-    if (res.entity.campaignId) {
-      getCampaignsListMethod({ sheetNumber: 0 });
+    if (campaignId) {
+      yield call(Api.editCampaign, campaignId, payload);
+    } else {
+      yield call(Api.saveCampaign, payload);
     }
   } catch (error) {
     console.log(error);
