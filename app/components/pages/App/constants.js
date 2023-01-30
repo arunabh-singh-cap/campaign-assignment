@@ -49,6 +49,11 @@ export const getSettingsMenuData = () => [
 
 export const getTopbarMenuDataValue = () => [
   {
+    label: <FormattedMessage {...globalMessages.campaignPage} />,
+    link: '/campaigns',
+    key: 'campaigns',
+  },
+  {
     label: <FormattedMessage {...globalMessages.tab1} />,
     link: '/',
     key: 'programs',

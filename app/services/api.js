@@ -4,7 +4,7 @@ import CapNotification from '@capillarytech/cap-ui-library/CapNotification';
 import { removeAuthenticationDetais } from '../utils/authWrapper';
 import config from '../config/app';
 import * as requestConstructor from './requestConstructor';
-const isNil = require('lodash/isNil');
+// const isNil = require('lodash/isNil');
 
 const { getAPICallObject, getBiHeaders } = requestConstructor;
 
@@ -225,4 +225,26 @@ export const upsertReturnStrategy = (programId, payload) => {
 export const upsertExpiryStrategy = (programId, payload) => {
   const url = `${API_ENDPOINT}/strategy/points-expiry/${programId}`;
   return request(url, getAPICallObject('POST', payload));
+};
+
+export const getCampaignsList = payload => {
+  const url =
+    'https://crm-nightly-new.cc.capillarytech.com/iris/v2/campaigns/filter';
+  return request(
+    url,
+    getAPICallObject('POST', payload, false, undefined, true),
+  );
+};
+
+export const saveCampaign = payload => {
+  const url = 'https://crm-nightly-new.cc.capillarytech.com/iris/v2/campaigns';
+  return request(
+    url,
+    getAPICallObject('POST', payload, false, undefined, true),
+  );
+};
+
+export const editCampaign = (campaignId, payload) => {
+  const url = `https://crm-nightly-new.cc.capillarytech.com/iris/v2/campaigns/${campaignId}`;
+  return request(url, getAPICallObject('PUT', payload, false, undefined, true));
 };

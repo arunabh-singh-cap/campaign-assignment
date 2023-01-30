@@ -12,22 +12,34 @@ export function getAPICallObject(
   body,
   isFileUpload = false,
   apiConfigs,
+  campaignHeaders = false,
 ) {
   const { token, orgID, user, ouId } = getAuthenticationDetails();
   let headers;
   if (isFileUpload) {
     headers = {};
   } else {
-    headers = {
-      'Content-Type': 'application/json',
-    };
+    headers = { 'Content-Type': 'application/json' };
   }
 
-  if (user && user.refID) {
+  if (campaignHeaders) {
+    headers['X-CAP-ORG'] = orgID;
+    // headers['X-CAP-OU'] = ''; //TODO:// need to add when org has ou
+
+    if (token !== undefined) {
+      headers['X-CAP-CT'] = token;
+    }
+  }
+
+  if (user && user.refID && !campaignHeaders) {
     headers['X-CAP-REMOTE-USER'] = user.refID;
   }
 
-  if (process.env.NODE_ENV !== 'production' && orgID !== undefined) {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    orgID !== undefined &&
+    !campaignHeaders
+  ) {
     headers['X-CAP-API-AUTH-ORG-ID'] = orgID;
   }
 
@@ -35,7 +47,11 @@ export function getAPICallObject(
     headers['x-cap-api-auth-ou-id'] = ouId;
   }
 
-  if (process.env.NODE_ENV !== 'production' && token !== undefined) {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    token !== undefined &&
+    !campaignHeaders
+  ) {
     headers.Authorization = `Bearer ${token}`;
   }
   if (get(apiConfigs, 'headers')) {
@@ -43,11 +59,7 @@ export function getAPICallObject(
     headers = { ...headers, ...configHeaders };
   }
 
-  const requestObj = {
-    method,
-    mode: 'cors',
-    headers: new Headers(headers),
-  };
+  const requestObj = { method, mode: 'cors', headers: new Headers(headers) };
 
   if (isProd) {
     requestObj.credentials = 'same-origin';

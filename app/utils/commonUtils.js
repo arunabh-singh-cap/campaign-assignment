@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import forEach from 'lodash/forEach';
+import moment from 'moment-timezone';
 import * as constants from '../components/pages/App/constants';
 
 const { MOBILEPUSH, ANDROID, IOS, SMS, EMAIL, WECHAT } = constants;
@@ -132,5 +133,26 @@ export const formatMessageHandler = (formatMessage, id, fallback) => {
     return formatMessage(id);
   } catch (err) {
     return fallback;
+  }
+};
+
+export const getEpochTimeStamp = ({
+  timezone,
+  date,
+  withMilliSeconds = true,
+} = {}) => {
+  let method = 'valueOf'; // Unix time in milliseconds: http://momentjs.com/docs/#/displaying/unix-timestamp-milliseconds/
+  if (!withMilliSeconds) {
+    method = 'unix'; // unix time in seconds: http://momentjs.com/docs/#/displaying/unix-timestamp/
+  }
+  if (timezone) {
+    return (
+      moment(date)
+        .tz(timezone)
+        // eslint-disable-next-line no-unexpected-multiline
+        [method]()
+    );
+  } else {
+    return moment(date)[method]();
   }
 };

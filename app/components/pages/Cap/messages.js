@@ -526,4 +526,8 @@ export default defineMessages({
     id: `${scope}.value`,
     defaultMessage: 'Value',
   },
+  campaignPage: {
+    id: `${scope}.campaign`,
+    defaultMessage: 'Campaigns',
+  },
 });
